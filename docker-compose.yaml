@@ -1,0 +1,92 @@
+version: "3"
+services:
+  db:
+    image: postgres:latest
+    container_name: db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - servicenetwork
+  
+  api:
+    build: .
+    image: afthab2015/apigateway:v1
+    container_name: api 
+    ports:
+      - "8000:8000"
+    restart: always
+    networks:
+      - servicenetwork
+
+  auth:
+    build: .
+    image: afthab2015/authsvc:v1
+    container_name: auth 
+    ports:
+      - "7777:7777"
+    restart: always
+    depends_on:
+      - db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+    networks:
+      - servicenetwork
+    
+  user:
+    build: .
+    image: afthab2015/usersvc:v1
+    container_name: user 
+    ports:
+      - "7778:7778"
+    restart: always
+    depends_on:
+      - db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+    networks:
+      - servicenetwork
+  
+  product:
+    build: .
+    image: afthab2015/productsvc:v1
+    container_name: product 
+    ports:
+      - "7779:7779"
+    restart: always
+    networks:
+      - servicenetwork
+
+  order:
+    build: .
+    image: afthab2015/ordersvc:v1
+    container_name: order 
+    ports:
+      - "7776:7776"
+    restart: always
+    depends_on:
+      - db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB:  ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+    networks:
+      - servicenetwork
+
+networks:
+  servicenetwork:
+    driver: bridge
+
+volumes:
+  dbdata:

@@ -1,0 +1,9 @@
+go 1.18
+
+use (
+	./GoGrpc-Api-Gateway
+	./GoGrpc-Order-Service
+	./GoGrpc-Product-Service
+	./GoGrpc-User-Service
+	./gogrpc-auth-service
+)
